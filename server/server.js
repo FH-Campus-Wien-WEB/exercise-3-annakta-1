@@ -4,55 +4,57 @@ const bodyParser = require('body-parser');
 const movieModel = require('./movie-model.js');
 
 const app = express();
-
-// Parse urlencoded bodies
-app.use(bodyParser.json()); 
-
-// Serve static content in directory 'files'
+app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'files')));
 
-/* Task 1.2: Add a GET /genres endpoint:
-   This endpoint returns a sorted array of all the genres of the movies
-   that are currently in the movie model.
-*/
-
-/* Task 1.4: Extend the GET /movies endpoint:
-   When a query parameter for a specific genre is given, 
-   return only movies that have the given genre
- */
+/* get all movies */
 app.get('/movies', function (req, res) {
-  let movies = Object.values(movieModel)
-  res.send(movies);
-})
+  const genre = req.query.genre;
+  let movies = Object.values(movieModel);
 
-// Configure a 'get' endpoint for a specific movie
+  if(genre){
+    movies = movies.filter(movie => movie.Genres.includes(genre));
+  }
+
+  res.json(movies);
+});
+
+/* get one movie */
 app.get('/movies/:imdbID', function (req, res) {
-  const id = req.params.imdbID
-  const exists = id in movieModel
- 
-  if (exists) {
-    res.send(movieModel[id])
-  } else {
-    res.sendStatus(404)    
+  const movie = movieModel[req.params.imdbID];
+
+  if(movie){
+    res.json(movie);
+  }else{
+    res.sendStatus(404);
   }
-})
 
-app.put('/movies/:imdbID', function(req, res) {
+});
 
-  const id = req.params.imdbID
-  const exists = id in movieModel
+/* put movie */
+app.put('/movies/:imdbID', function (req, res){
+  const imdbID = req.params.imdbID;
+  const exists = movieModel[imdbID];
+  movieModel[imdbID] = req.body;
 
-  movieModel[req.params.imdbID] = req.body;
-  
-  if (!exists) {
-    res.status(201)
-    res.send(req.body)
-  } else {
-    res.sendStatus(200)
+  if(exists){
+    res.sendStatus(200);
+  }else{
+    res.status(201).json(req.body);
   }
-  
-})
 
-app.listen(3000)
+});
 
-console.log("Server now listening on http://localhost:3000/")
+/* new endpoint for genres */
+app.get('/genres', function(req,res){
+  const genres = new Set();
+  Object.values(movieModel).forEach(movie => {
+    movie.Genres.forEach(g => genres.add(g));
+  });
+
+  res.json(Array.from(genres).sort());
+});
+
+app.listen(3000);
+
+console.log("Server now listening on http://localhost:3000/");
