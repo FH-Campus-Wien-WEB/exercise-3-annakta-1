@@ -1,9 +1,95 @@
-import { ElementBuilder, ParentChildBuilder } from "./builders.js";
+function appendMovie(movie){
+  const main = document.querySelector("main");
+  const article = new ArticleBuilder()
+  .setId(movie.imdbID)
+  .appendChild(
+  new HeadingBuilder(2)
+  .setText(movie.Title)
+  .build()
+  )
+  
+  .appendChild(
+  new ImageBuilder()
+  .setSource(movie.Poster)
+  .build()
+  )
+  
+  .appendChild(
+  new ParagraphBuilder()
+  .setText("Released: " + movie.Released)
+  .build()
+  )
+  
+  .appendChild(
+  new ParagraphBuilder()
+  .setText("Runtime: " + movie.Runtime + " min")
+  .build()
+  )
+  
+  .appendChild(
+  buildGenreSpans(movie.Genres)
+  )
+  
+  .appendChild(
+  buildList("Directors", movie.Directors)
+  )
+  
+  .appendChild(
+  buildList("Writers", movie.Writers)
+  )
+  
+  .appendChild(
+  buildList("Actors", movie.Actors)
+  )
+  
+  .appendChild(
+  new ParagraphBuilder()
+  .setText(movie.Plot)
+  .build()
+  )
+  
+  .appendChild(
+  new ParagraphBuilder()
+  .setText("Metascore: " + movie.Metascore)
+  .build()
+  )
+  
+  .appendChild(
+  new ParagraphBuilder()
+  .setText("IMDB Rating: " + movie.imdbRating)
+  .build()
+  )
+  
+  .appendChild(
+  new ButtonBuilder()
+  .setText("Edit")
+  .onClick(function(){
+  location.href = "edit.html?imdbID=" + movie.imdbID;
+  })
+  .build()
 
-class ParagraphBuilder extends ParentChildBuilder {
-  constructor() {
-    super("p", "span");
-  }
+  )
+  
+  .build();
+  
+  main.appendChild(article);
+  
+}
+  
+function buildGenreSpans(genres){
+  const p = new ParagraphBuilder();
+  genres.forEach(g => {
+  p.appendChild(
+  new SpanBuilder()
+  .addClass("genre")
+  .setText(g)
+  .build()
+  );
+  
+  });
+  
+  return p.build();
+  
 }
 
 class ListBuilder extends ParentChildBuilder {
