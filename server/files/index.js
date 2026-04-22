@@ -142,24 +142,27 @@ window.onload = function(){
   xhr.open("GET","/genres");
   xhr.onload = function(){
   const genres = JSON.parse(xhr.responseText);
-  const allButton = document.createElement("button");
-  allButton.textContent = "All";
-  allButton.onclick = function(){
-  loadMovies();
-  
-  };
-  
-  nav.appendChild(allButton);
-  genres.forEach(g => {
-  const btn = document.createElement("button");
-  btn.textContent = g;
 
-  btn.onclick = function(){
-  loadMovies(g);
-  };
-  
+  const allButton = new ButtonBuilder()
+  .setText("All")
+  .onClick(function(){
+    loadMovies();
+  })
+  .build();
+nav.appendChild(allButton);
+
+genres.forEach(g => {
+
+  const btn = new ButtonBuilder()
+    .setText(g)
+    .onClick(function(){
+      loadMovies(g);
+    })
+    .build();
+
   nav.appendChild(btn);
-  });
+
+});
   
   nav.querySelector("button").click();
   };
